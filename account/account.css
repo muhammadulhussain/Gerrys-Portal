@@ -1,0 +1,321 @@
+/* ===== Root Theme Colors ===== */
+:root {
+    --primary-color: #ebb41e;
+    --secondary-color: #f4f6f9;
+    --text-color: #333;
+    --hover-dark: #d9a118;
+}
+
+/* ===== Smooth Page Load Animation ===== */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    opacity: 0;
+    transform: translateY(15px);
+    animation: fadeSlideIn 0.7s ease-in-out forwards;
+}
+
+@keyframes fadeSlideIn {
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Navbar Styling ===== */
+.navbar {
+    background: linear-gradient(90deg, #e0dfdd, var(--primary-color));
+    padding: 12px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar img {
+    height: 70px;
+}
+
+.navbar a {
+    background: white;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+.navbar a:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+/* ===== Button Styling ===== */
+.btn-custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--primary-color);
+    color: #000;
+    padding: 10px 18px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-size: 14px;
+}
+
+.btn-custom:hover {
+    background-color: var(--hover-dark);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== Main Container Box ===== */
+.container-box,
+.form-card,
+.card-box {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px 40px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Form Inputs Styling ===== */
+.input-style {
+    border-radius: 6px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    transition: all 0.3s ease;
+}
+
+.input-style:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 6px rgba(235, 180, 30, 0.3);
+    outline: none;
+}
+
+/* ===== Password Toggle Eye ===== */
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .toggle-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+}
+
+/* ===== Password Strength ===== */
+.strength {
+    font-size: 13px;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+.strength.weak { color: red; }
+.strength.medium { color: orange; }
+.strength.strong { color: green; }
+
+/* ===== Profile Image Styling ===== */
+.profile-img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--primary-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* ===== Profile Header ===== */
+.profile-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.profile-header p {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ===== Profile Info Rows ===== */
+.profile-info .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-info .row label {
+    font-weight: 600;
+}
+
+.profile-info .row span {
+    color: #555;
+}
+
+/* ===== Alerts ===== */
+.alert {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.alert-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+/* ===== Table Styling ===== */
+.table th {
+    background-color: #212529;
+    color: #fff;
+    vertical-align: middle;
+}
+
+.table td, .table th {
+    padding: 10px;
+    text-align: center;
+}
+
+/* ===== General Body ===== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+}
+
+/* ===== Card Container ===== */
+.form-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+}
+
+/* ===== Card Header ===== */
+.form-card h3 {
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+/* ===== Labels and Inputs ===== */
+.form-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.input-style {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.input-style:focus {
+    outline: none;
+    border-color: #ebb41e;
+    box-shadow: 0 0 5px rgba(235,180,30,0.3);
+}
+
+/* ===== Buttons ===== */
+.btn-custom {
+    background: #ebb41e;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-custom:hover {
+    background: #d9a118;
+}
+
+/* ===== Profile Image Upload ===== */
+.profile-img-preview {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #ddd;
+    margin-bottom: 10px;
+}
+
+/* ===== Show/Hide Password Icon ===== */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #555;
+}
+
+/* ===== Top Header / Navbar ===== */
+.navbar {
+    background: linear-gradient(90deg, rgb(255, 243, 220), #ebb41e);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar img {
+    height: 70px;
+}
+
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .profile-info .row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-info .row span {
+        margin-top: 3px;
+    }
+
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .navbar img {
+        height: 60px;
+    }
+}
+
