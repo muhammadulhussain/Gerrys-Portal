@@ -11,28 +11,58 @@ if (strcasecmp($role, 'Admin') === 0) {
 } else {
     $dashboardURL = '/gerrys_project/employee/employee_dashboard_.php';
 }
+$search = trim($_GET['search'] ?? '');
+$searchLike = '%' . $search . '%';
 
 // Fetch customers
 if (strcasecmp($role, 'Admin') === 0) {
-    $query = "SELECT c.*, s.name AS station_name
-              FROM customers c
-              LEFT JOIN stations s ON c.station_id = s.id
-              ORDER BY c.id ASC";
-    $result = $conn->query($query);
-    if (!$result) die('❌ SQL Error: ' . $conn->error);
+
+    if ($search !== '') {
+        $sql = "SELECT c.*, s.name AS station_name
+                FROM customers c
+                LEFT JOIN stations s ON c.station_id = s.id
+                WHERE c.customer_name LIKE ?
+                   OR c.company_name LIKE ?
+                   OR c.ip LIKE ?
+                ORDER BY c.id DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sss", $searchLike, $searchLike, $searchLike);
+    } else {
+        $sql = "SELECT c.*, s.name AS station_name
+                FROM customers c
+                LEFT JOIN stations s ON c.station_id = s.id
+                ORDER BY c.id DESC";
+        $stmt = $conn->prepare($sql);
+    }
+
 } else {
-    $query = "SELECT c.*, s.name AS station_name
-              FROM customers c
-              LEFT JOIN stations s ON c.station_id = s.id
-              WHERE c.station_id = ?
-              ORDER BY c.id ASC";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $station_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+
+    if ($search !== '') {
+        $sql = "SELECT c.*, s.name AS station_name
+                FROM customers c
+                LEFT JOIN stations s ON c.station_id = s.id
+                WHERE c.station_id = ?
+                  AND (c.customer_name LIKE ?
+                   OR c.company_name LIKE ?
+                   OR c.ip LIKE ?)
+                ORDER BY c.id DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("isss", $station_id, $searchLike, $searchLike, $searchLike);
+    } else {
+        $sql = "SELECT c.*, s.name AS station_name
+                FROM customers c
+                LEFT JOIN stations s ON c.station_id = s.id
+                WHERE c.station_id = ?
+                ORDER BY c.id DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $station_id);
+    }
 }
 
+$stmt->execute();
+$result = $stmt->get_result();
 $customers = $result->fetch_all(MYSQLI_ASSOC);
+
 
 // Fetch POPs & Vendors
 $customerIds = array_column($customers, 'id');
@@ -92,7 +122,14 @@ body { background-color: #f8f9fa; }
         <h4 class="fw-bold mb-0">Customers Information</h4>
       </div>
       <div class="d-flex align-items-center">
-        <input type="text" id="searchInput" class="form-control me-2" onkeyup="searchTable()" placeholder="Search Customer..." style="width:250px;">
+        <form method="GET" class="d-flex align-items-center">
+            <input type="text"
+                  name="search"
+                  value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+                  class="form-control me-2"
+                  placeholder="Search Customer..."
+                  style="width:250px;">
+        </form>
         <span id="searchCount"></span>
         <button class="btn gerrys-btn ms-3" onclick="window.location.href='<?= $dashboardURL ?>'">
           <i class="fa-solid fa-arrow-left"></i> Back
@@ -189,7 +226,7 @@ body { background-color: #f8f9fa; }
       </div>
     </div>
   </div>
-</div>
+</div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 <?php endforeach; ?>
 
 <button id="scrollBtn" onclick="scrollPage()">↓ Scroll</button>
@@ -202,7 +239,7 @@ function searchTable() {
     rows.forEach(row => {
         if (row.innerText.toLowerCase().includes(input)) { row.style.display = ""; count++; }
         else row.style.display = "none";
-    });
+    }); 
     let countBox = document.getElementById("searchCount");
     if (input.length > 0) { countBox.innerHTML = count > 0 ? `Found ${count} customer(s)` : "No matching customers"; countBox.classList.add("show"); }
     else { countBox.classList.remove("show"); countBox.innerHTML = ""; }
