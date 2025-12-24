@@ -24,43 +24,32 @@ if ($userStation) {
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $report_month = $_POST['report_month'];
-    $station_id   = $userStation; // AUTO LOCKED STATION
-    $client_type  = $_POST['client_type'] ?? null;
-    $vendor_id    = $_POST['vendor_id'] ?? null;
-    $current      = $_POST['current_bandwidth'];
-    $used         = $_POST['used_bandwidth'];
-    $desc         = trim($_POST['description']);
+    $station_id  = $userStation; // auto locked
+    $client_type = $_POST['client_type'] ?? null;
+    $vendor_id   = $_POST['vendor_id'] ?? null;
+    $current     = $_POST['current_bandwidth'];
+    $used        = $_POST['used_bandwidth'];
+    $desc        = trim($_POST['description']);
 
-    // ===== FIX START =====
-    if ($vendor_id === '' || $vendor_id === '0') {
+    // Normalize vendor
+    if ($vendor_id === '' || $client_type === 'Gerrys Region') {
         $vendor_id = null;
     }
 
-    if ($client_type === 'Direct Client' || $client_type === 'In-Direct Client') {
-        $vendor_id = null;
-    }
-
-    if ($vendor_id !== null) {
-        $vendor_id = (string)$vendor_id; // bind safe
-        $client_type = null;
-    }
-    // ===== FIX END =====
-
-    if ($current < $used) {
-        $error = "❌ Used bandwidth cannot exceed current bandwidth!";
+    // Validation
+    if ($client_type === 'Vendor' && $vendor_id === null) {
+        $error = "Vendor must be selected when Client Type is Vendor.";
+    } elseif ($current < $used) {
+        $error = "Used bandwidth cannot exceed current bandwidth.";
     } else {
 
-        $sql = "INSERT INTO bandwidth_reports 
-        (report_month, station_id, vendor_id, client_type, current_bandwidth, used_bandwidth, description)
-        VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO bandwidth_reports
+                (station_id, vendor_id, client_type, current_bandwidth, used_bandwidth, description)
+                VALUES (?, ?, ?, ?, ?, ?)";
 
         $stmt = $conn->prepare($sql);
-
-        // 🔴 IMPORTANT FIX: vendor_id type = s (string)
         $stmt->bind_param(
-            "sisssds",
-            $report_month,
+            "issdds",
             $station_id,
             $vendor_id,
             $client_type,
@@ -74,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = "Database error: " . $conn->error;
         }
+
         $stmt->close();
     }
 }
@@ -84,9 +74,12 @@ $vendors  = $conn->query("SELECT id, vendor_name FROM vendors ORDER BY vendor_na
 
 // Fetch Reports for this station only
 $reports = $conn->prepare("
-    SELECT br.report_month, br.report_date, s.name AS station_name, 
-           COALESCE(br.client_type, v.vendor_name) AS type,
-           br.current_bandwidth, br.used_bandwidth, br.description
+    SELECT br.report_date,
+           s.name AS station_name,
+           COALESCE(v.vendor_name, br.client_type) AS type,
+           br.current_bandwidth,
+           br.used_bandwidth,
+           br.description
     FROM bandwidth_reports br
     JOIN stations s ON br.station_id = s.id
     LEFT JOIN vendors v ON br.vendor_id = v.id
@@ -182,8 +175,8 @@ $result = $reports->get_result();
       <label>Client Type</label>
       <select name="client_type" id="client_type" class="form-select" onchange="toggleVendor()">
         <option value="">-- Select --</option>
-        <option value="Direct Client">Direct</option>
-        <option value="In-Direct Client">In-Direct</option>
+        <option value="Gerrys Region">Gerrys Region</option>
+        <option value="Vendor">Vendor</option>
       </select>
     </div>
 

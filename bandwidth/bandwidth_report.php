@@ -1,10 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/session_check.php';
 require_role(['Employee', 'Admin']);
-
 require_once __DIR__ . '/../includes/db.php';
 
-// Role & station from session
+// Role & station
 $role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Employee';
 $userStationId = isset($_SESSION['station_id']) ? intval($_SESSION['station_id']) : null;
 
@@ -16,7 +15,7 @@ $dashboardURL = strcasecmp($role, 'Admin') === 0
     ? '/gerrys_project/admin/admin_dashboard.php'
     : '/gerrys_project/employee/employee_dashboard_.php';
 
-// === Month selection handling ===
+// Month selection
 $selectedMonth = isset($_GET['month']) ? trim($_GET['month']) : date("Y-m");
 if (!preg_match('/^\d{4}-\d{2}$/', $selectedMonth)) {
     $selectedMonth = date("Y-m");
@@ -24,58 +23,58 @@ if (!preg_match('/^\d{4}-\d{2}$/', $selectedMonth)) {
 $startDate = $selectedMonth . "-01";
 $endDate = date("Y-m-t", strtotime($startDate));
 
-// === Sections array ===
+// Sections (frontend labels unchanged)
 $sections = [
-    "Direct Client"     => [],
-    "In-Direct Client"  => [],
-    "GERRY'S Vendor"    => []
-];
+    "Gerrys Region" => [],
+    "GERRY'S Vendor" => []
+]; 
 
-// Build base query and WHERE clauses safely
-$where = " WHERE b.report_date BETWEEN '" . $conn->real_escape_string($startDate) . "' AND '" . $conn->real_escape_string($endDate) . "' ";
+// WHERE clause
+$where = " WHERE b.report_date BETWEEN '" . $conn->real_escape_string($startDate) . "' 
+           AND '" . $conn->real_escape_string($endDate) . "' ";
 
-// Apply station filter only for non-admins
 if (strcasecmp($role, 'Admin') !== 0 && $userStationId) {
     $where .= " AND b.station_id = " . intval($userStationId) . " ";
 }
 
-// === Updated Query: Section depends only on client_type ===
+// Updated query (BACKEND ONLY)
 $query = "
 SELECT 
     b.report_id,
     s.name AS station,
     v.vendor_name AS vendor,
-    b.client_type AS client_type,
+    b.client_type,
     b.current_bandwidth,
     b.used_bandwidth,
     (b.current_bandwidth - b.used_bandwidth) AS remaining_bandwidth,
     b.description,
     b.station_id,
-    CASE 
-        WHEN b.client_type = 'Direct Client' THEN 'Direct Client'
-        WHEN b.client_type = 'In-Direct Client' THEN 'In-Direct Client'
+    CASE
+        WHEN b.client_type = 'Gerrys Region' THEN 'Gerrys Region'
         WHEN b.client_type = 'Vendor' THEN 'GERRY''S Vendor'
-        ELSE 'Direct Client'
+        ELSE 'Gerrys Region'
     END AS section_type
 FROM bandwidth_reports b
 JOIN stations s ON b.station_id = s.id
 LEFT JOIN vendors v ON b.vendor_id = v.id
 " . $where . "
 ORDER BY section_type, s.name
-;";
+";
 
-// Execute query
+// Execute
 $result = $conn->query($query);
 if ($result !== false) {
     while ($row = $result->fetch_assoc()) {
         $sec = $row['section_type'];
+
         if (!isset($sections[$sec])) {
-            $sec = "Direct Client";
+            continue;
         }
+
         $sections[$sec][] = [
             'report_id' => $row['report_id'],
             'station'   => strtoupper($row['station']),
-            'vendor'    => $row['vendor'] ?? 'Null',
+            'vendor'    => $row['vendor'] ?? '',
             'current'   => (float)$row['current_bandwidth'],
             'used'      => (float)$row['used_bandwidth'],
             'remaining' => (float)$row['remaining_bandwidth'],
@@ -84,18 +83,19 @@ if ($result !== false) {
     }
 }
 
-// Utility function
+// Utility
 function format_num($n) {
     return number_format((float)$n, 2);
 }
 
-// Generate last 12 months list (value => label)
+// Last 12 months
 $months = [];
 for ($i = 0; $i < 12; $i++) {
     $mVal = date("Y-m", strtotime("-$i months"));
     $months[$mVal] = date("F Y", strtotime($mVal));
 }
 ?>
+
 
 <!doctype html>
 <html lang="en">

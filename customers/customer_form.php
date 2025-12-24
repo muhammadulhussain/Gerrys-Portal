@@ -1,16 +1,17 @@
 <?php
-session_start();
-include '../includes/db.php';
-include($_SERVER['DOCUMENT_ROOT'] . "/gerrys_project/includes/header.php");
-function require_role($roles = []) {
-    if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], $roles)) {
-        die("Unauthorized access.");
-    }
-}
+// 1. Database + session protection
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/session_check.php';
 
-// Logged-in station
+// 2. Role restriction (adjust roles if needed)
+require_role(['Admin', 'Employee']);
+
+// 3. Header (after session is validated)
+require_once $_SERVER['DOCUMENT_ROOT'] . '/gerrys_project/includes/header.php';
+
+// 4. Logged-in station info
 $station_id = $_SESSION['station_id'] ?? 0;
-$station = $_SESSION['station'] ?? 'Unknown';
+$station    = $_SESSION['station'] ?? 'Unknown';
 
 // Fetch POPs for this station
 $pop_result = $conn->query("SELECT pop_id, pop_name FROM pops WHERE station_id=$station_id ORDER BY pop_name ASC");
