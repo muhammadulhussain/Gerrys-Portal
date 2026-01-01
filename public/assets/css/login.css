@@ -1,0 +1,103 @@
+/* === Background === */
+body {
+  background: linear-gradient(135deg, #8ebee6ff, #c7d8f8ff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  animation: fadeBg 6s ease-in-out infinite alternate;
+}
+
+@keyframes fadeBg {
+  0% { background: linear-gradient(135deg, #8ebee6ff, #c7d8f8ff); }
+  100% { background: linear-gradient(135deg, #91c9e9, #bcd0f6); }
+}
+
+/* === Login Card === */
+.login-card {
+  background-color: #fff;
+  color: #000;
+  border-radius: 15px;
+  padding: 35px 45px;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+  animation: slideIn 1s ease forwards;
+  opacity: 0;
+  transform: translateY(-40px);
+}
+
+@keyframes slideIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Logo === */
+.logo img {
+  height: 150px;
+  display: block;
+  margin: 0 auto 15px;
+  animation: pulseLogo 3s ease-in-out infinite;
+}
+
+@keyframes pulseLogo {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
+.logo h4 {
+  font-weight: 700;
+  color: #1b4781ff;
+}
+
+/* === Inputs === */
+input.form-control,
+select.form-select {
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+input.form-control:focus,
+select.form-select:focus {
+  border-color: #2173c5ff;
+  box-shadow: 0 0 10px rgba(33,115,197,0.3);
+}
+
+/* === Password Toggle === */
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 12px;
+  top: 70%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #777;
+}
+
+/* === Button === */
+.btn-primary {
+  background-color: #2173c5ff;
+  border: none;
+  border-radius: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #1b4781ff;
+}
+
+/* === Station animation === */
+.fade-slide {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeSlide 0.6s ease forwards;
+}
+
+@keyframes fadeSlide {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
